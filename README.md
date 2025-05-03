@@ -25,9 +25,9 @@ zh, vi, ja, ko
 ar, fa, ur, kk
 it, en, de, es
 
-Total number of trainable parameters to hidden dim and moe experts mapping:
-1. (1) 766,556,160 = 2048, 512
-2. (2)
-3. (4)
-4. (8)
-5. (16) 48,925,020 = 196, 32
+<!-- Total number of trainable parameters to hidden dim and moe experts mapping:
+1. (01) 766,556,160 = 2048, 512
+2. (02) 382,931,320 = 1224, 256
+3. (04) 191,639,040 = 0712, 128
+4. (08) 099,883,648 = 0384, 064 
+5. (16) 048,925,020 = 0196, 032 -->
