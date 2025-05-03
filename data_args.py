@@ -10,8 +10,9 @@ class DataTrainingArguments:
     dataset_name: Optional[str] = field(
         default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
     )
-    dataset_config_name: Optional[str] = field(
-        default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
+    dataset_config_name: Optional[List[str]] = field(
+        default_factory = lambda : ["ar", "de", "en", "es", "fa", "gu", "hi", "it", "ja", "kk", "ko", "pa", "si", "ur", "vi", "zh"], 
+        metadata={"help": "A list of configuration names from the dataset to use (via the datasets library)."}
     )
     dataset_path: Optional[str] = field(
         default=None, metadata={"help": "Absolute path of the dataset on disk"}

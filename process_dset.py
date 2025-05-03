@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 from __future__ import annotations
 
+from typing import List
 import datasets
 from datasets import load_dataset
 
@@ -25,7 +26,7 @@ from transformers import HfArgumentParser, AutoTokenizer, TrainingArguments
 
 def load_processed_dataset(
     dataset_name: str | None = None, 
-    dataset_config: str | None = None,
+    dataset_config: List[str] | None = None,
     dataset_path: str | None = None,
     split : str | None = None,
     num_samples : int | None = None, 
@@ -36,10 +37,16 @@ def load_processed_dataset(
         if dataset_path != None:
             tokenized_datasets = datasets.load_from_disk(dataset_path)
         else:
+            dataset_list = list()
             if split == None:
-                tokenized_datasets = datasets.load_from_disk(f"/share/suh-scrap2/tier_rout/datasets/{dataset_name}/{dataset_config}")
+                for domain in dataset_config:
+                    tokenized_datasets = datasets.load_from_disk(f"/share/suh-scrap2/tier_rout/datasets/{dataset_name}/{domain}")
             else:
-                tokenized_datasets = datasets.load_from_disk(f"/share/suh-scrap2/tier_rout/datasets/{dataset_name}/{dataset_config}/{split}")
+                for domain in dataset_config:
+                    tokenized_datasets = datasets.load_from_disk(f"/share/suh-scrap2/tier_rout/datasets/{dataset_name}/{domain}/{split}")
+            dataset_list.append(tokenized_datasets)
+            tokenized_datasets["train"] = datasets.concatenate_datasets([i["train"] for i in dataset_list])
+            tokenized_datasets["validation"] = datasets.concatenate_datasets([i["validation"] for i in dataset_list])
         if num_samples != None:
             if seed == None:
                 raise(ValueError("`seed` must not be None if num_samples is not None"))
@@ -50,7 +57,7 @@ def load_processed_dataset(
         return tokenized_datasets
     except FileNotFoundError:
         tok_logger.error("run process_dset.py first")
-        raise FileNotFoundError(f"No tokenized datasets found for {dataset_name}/{dataset_config}")
+        raise FileNotFoundError(f"No tokenized datasets found for {dataset_name}/{dataset_config} or {dataset_path}")
 
 def concat_datasets(path : str) -> None:
     dataset_chunks = os.listdir(path)
