@@ -1,0 +1,6 @@
+{
+    "hidden_size" : 196,
+    "moe_experts" : 32,
+    "per_device_train_batch_size": 20,
+    "per_device_eval_batch_size": 20
+}
