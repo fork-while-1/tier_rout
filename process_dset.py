@@ -35,25 +35,29 @@ def load_processed_dataset(
     tok_logger = logging.get_logger("transformers.tokenization_utils_base")
     try:
         if dataset_path != None:
-            tokenized_datasets = datasets.load_from_disk(dataset_path)
+            tokenized_datasets = datasets.load_from_disk(dataset_path, keep_in_memory = True)
         else:
             dataset_list = list()
             if split == None:
                 for domain in dataset_config:
-                    tokenized_datasets = datasets.load_from_disk(f"/share/suh-scrap2/tier_rout/datasets/{dataset_name}/{domain}")
+                    tokenized_datasets = datasets.load_from_disk(f"/share/suh-scrap2/tier_rout/datasets/{dataset_name}/{domain}", keep_in_memory = True)
             else:
                 for domain in dataset_config:
-                    tokenized_datasets = datasets.load_from_disk(f"/share/suh-scrap2/tier_rout/datasets/{dataset_name}/{domain}/{split}")
+                    tokenized_datasets = datasets.load_from_disk(f"/share/suh-scrap2/tier_rout/datasets/{dataset_name}/{domain}/{split}", keep_in_memory = True)
             dataset_list.append(tokenized_datasets)
             tokenized_datasets["train"] = datasets.concatenate_datasets([i["train"] for i in dataset_list])
             tokenized_datasets["validation"] = datasets.concatenate_datasets([i["validation"] for i in dataset_list])
         if num_samples != None:
             if seed == None:
                 raise(ValueError("`seed` must not be None if num_samples is not None"))
-            tokenized_datasets = tokenized_datasets.shuffle(seed = seed)
-            tokenized_datasets = tokenized_datasets.select(range(num_samples))
+            
+            # This is extremely slow because it generates a layer of indirection, and 
+            # now the dataset is no longer sequential access. 
+            # To mititgate this, for now we keep the entire dataset in memory
+            tokenized_datasets = tokenized_datasets.shuffle(seed = seed, keep_in_memory = True)
+            tokenized_datasets = tokenized_datasets.select(range(num_samples), keep_in_memory = True)
         if seed != None:
-            tokenized_datasets = tokenized_datasets.shuffle(seed = seed)
+            tokenized_datasets = tokenized_datasets.shuffle(seed = seed, keep_in_memory = True)
         return tokenized_datasets
     except FileNotFoundError:
         tok_logger.error("run process_dset.py first")
