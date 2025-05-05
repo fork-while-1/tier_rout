@@ -25,7 +25,6 @@ import logging
 import math
 import os
 import sys
-from typing import Optional
 from model_args import ModelArguments
 from data_args import DataTrainingArguments
 
@@ -49,7 +48,7 @@ from transformers import (
     is_torch_xla_available,
     set_seed,
 )
-from transformers.testing_utils import CaptureLogger
+
 from transformers.trainer_utils import get_last_checkpoint
 
 from modeling_monet import MonetForCausalLM, MonetConfig
